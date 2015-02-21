@@ -68,14 +68,25 @@ public class MapMatchingMain {
             String gpxLocation = args.get("gpx", "");
             File[] files;
             if (gpxLocation.contains("*")) {
-                int lastIndex = gpxLocation.lastIndexOf(File.separator);
-                final String pattern;
+                int lastIndex;
                 File dir = new File(".");
-                if (lastIndex >= 0) {
-                    dir = new File(gpxLocation.substring(0, lastIndex));
-                    pattern = gpxLocation.substring(lastIndex + 1);
-                } else {
-                    pattern = gpxLocation;
+                final String pattern;
+                if ( (gpxLocation.contains("{")) && (gpxLocation.contains("}")) ) {
+                   // Treat everything within {} as regular expression for the filename. E.g. {[\w-_]*\.gpx} can be used to exclude prior generated "res" files
+                   int bracketIndex=gpxLocation.lastIndexOf("{");
+                   lastIndex = gpxLocation.substring(0, bracketIndex).lastIndexOf(File.separator);
+                   dir = new File(gpxLocation.substring(0, lastIndex));
+                   pattern = gpxLocation.substring(bracketIndex+1, gpxLocation.length()-1);
+                }
+                else
+                {
+                    lastIndex = gpxLocation.lastIndexOf(File.separator);
+                    if (lastIndex >= 0) {
+                        dir = new File(gpxLocation.substring(0, lastIndex));
+                        pattern = gpxLocation.substring(lastIndex + 1);
+                    } else {
+                        pattern = gpxLocation;
+                    }
                 }
 
                 files = dir.listFiles(new FilenameFilter() {
