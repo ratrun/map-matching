@@ -24,7 +24,10 @@ import com.graphhopper.storage.GraphStorage;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,8 @@ public class MapMatchingMain {
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final ArrayList <ArrayList<String>> htmlresultlist = new ArrayList<ArrayList<String>>();
+    private final List <String> gpxfiles = new ArrayList <String> ();
 
     private void start(CmdArgs args) {
         String action = args.get("action", "").toLowerCase();
@@ -110,34 +115,118 @@ public class MapMatchingMain {
             StopWatch importSW = new StopWatch();
             StopWatch matchSW = new StopWatch();
             for (File gpxFile : files) {
+                ArrayList <String>  htmlresult= new ArrayList <String> ();
                 try {
                     importSW.start();
                     List<GPXEntry> inputGPXEntries = new GPXFile().doImport(gpxFile.getAbsolutePath()).getEntries();
                     importSW.stop();
                     matchSW.start();
-                    MatchResult mr = mapMatching.doWork(inputGPXEntries);
+                    String fileName = gpxFile.getAbsolutePath().substring(gpxFile.getAbsolutePath().lastIndexOf("\\")+1);
+                    gpxfiles.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + gpxFile.toString() + " target=\"hiddenIframe\" >" + fileName + "</a>");
+                    MatchResult mr = mapMatching.doWork(inputGPXEntries,htmlresult);
                     matchSW.stop();
                     System.out.println(gpxFile);
                     System.out.println("\tmatches:\t" + mr.getEdgeMatches().size() + ", gps entries:" + inputGPXEntries.size());
                     System.out.println("\tgpx length:\t" + (float) mr.getGpxEntriesLength() + " vs " + (float) mr.getMatchLength());
                     System.out.println("\tgpx time:\t" + mr.getGpxEntriesMillis() / 1000f + " vs " + mr.getMatchMillis() / 1000f);
-
+                    
+                    htmlresult.add("<small>");
+                    htmlresult.add("matches: &ensp; " + mr.getEdgeMatches().size() + ", gps entries:" + inputGPXEntries.size() + "<br>");
+                    htmlresult.add("gpx length: &ensp; " + (float) mr.getGpxEntriesLength() + " vs " + (float) mr.getMatchLength() + "<br>");
+                    htmlresult.add("gpx time: &ensp; " + mr.getGpxEntriesMillis() / 1000f + " vs " + mr.getMatchMillis() / 1000f  + "<br>");
+                    htmlresult.add("</small>");
+                    
                     String outFile = gpxFile.getAbsolutePath() + ".res.gpx";
-                    System.out.println("\texport results to:" + outFile);
                     new GPXFile(mr).doExport(outFile);
+                    fileName = fileName + ".res.gpx";
+                    htmlresult.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + outFile + " target=\"hiddenIframe\" >" + fileName + "</a>");
+
                 } catch (Exception ex) {
                     importSW.stop();
                     matchSW.stop();
+                    //htmlresult.add("Problem with file " + gpxFile + " Error: " + ex.getMessage() + "<br>");
                     logger.error("Problem with file " + gpxFile + " Error: " + ex.getMessage());
                 }
+                htmlresultlist.add(htmlresult);
             }
             System.out.println("gps import took:" + importSW.getSeconds() + "s, match took: " + matchSW.getSeconds());
+
+            generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""));
 
         } else {
             System.out.println("Usage: Do an import once, then do the matching\n"
                     + "./map-matching action=import datasource=your.pbf\n"
                     + "./map-matching action=match gpx=your.gpx\n"
                     + "./map-matching action=match gpx=.*gpx\n\n");
+        }
+    }
+    
+    private void generateHtmlReport (List <String> gpxfiles, ArrayList <ArrayList<String>> findinglistoflists, String reportFileName)
+    {
+        StringBuilder html = new StringBuilder();
+        html.append( "<!doctype html>\n" );
+        html.append( "<html lang='en'>\n" );
+
+        html.append( "<head>\n" );
+        html.append( "<meta charset='utf-8' >\n" );
+        html.append( "<title>Page for improving OSM data based on map-matched GPX files</title>\n" );
+        html.append( "<style>");
+        html.append( "body {");
+          html.append( "color: #000;");
+          html.append( "font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;");
+          html.append( "line-height: 1.0;");
+          html.append( "color: #111111;");
+          html.append( "font-size:50%");
+          html.append( "background-color: white;");
+          html.append( "margin: 0;");
+          html.append( "td { border:thin solid black; }");
+          html.append( "min-width: 800px;");
+        html.append( "}");
+
+        html.append( "/* iframe for josm and rawedit links */");
+        html.append( "iframe#hiddenIframe {");
+          html.append( "display: none;");
+          html.append( "position: absolute;");
+        html.append( "}");
+        html.append( "</style>");
+        
+        html.append( "</head>\n\n" );
+
+        html.append( "<body>\n" );
+        
+        html.append("<h1>Result of map-match</h1>");
+        html.append("<table border=\"1\" cellpadding=\"2\" frame=\"box\">");
+        html.append("<colgroup width=\"200\" span=\"3\"></colgroup>");
+        int i = 0;
+        for ( String josmlink : gpxfiles ) {
+              html.append("<tr>");
+              html.append("<td>" + josmlink +"</td>");
+              
+              html.append("<td>");
+              List <String> findings=findinglistoflists.get(i);
+              for ( String reportline : findings ) {
+                  html.append(reportline);
+              }
+              html.append("</td>");
+              
+              html.append("</tr>");
+              i++;
+        }
+        html.append("</table>");
+        
+        html.append("<iframe id=\"hiddenIframe\" name=\"hiddenIframe\"></iframe>");
+
+        html.append( "</body>\n\n" );
+
+        html.append( "</html>" );
+        try {
+            File reportFile = new File (reportFileName);
+            PrintWriter out = new PrintWriter( reportFile );
+            out.println(html);
+            out.close();
+         } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            System.out.println("Could not create file" + reportFileName );
         }
     }
 }

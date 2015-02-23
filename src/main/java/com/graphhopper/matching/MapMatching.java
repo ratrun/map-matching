@@ -30,6 +30,7 @@ import com.graphhopper.storage.EdgeEntry;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.*;
+import com.graphhopper.util.shapes.GHPoint;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.procedure.TIntObjectProcedure;
@@ -126,9 +127,12 @@ public class MapMatching {
      * @param gpxList the input list with GPX points which should match to edges
      * of the graph specified in the constructor
      */
-    public MatchResult doWork(List<GPXEntry> gpxList) {
+    public MatchResult doWork(List<GPXEntry> gpxList, List <String> html) {
         int currentIndex = 0;
         if (gpxList.size() < 2) {
+            html.add("<span style=\"color:red;\">");
+            html.add("gpx list needs at least 2 points!<br>");
+            html.add("</span>");
             throw new IllegalStateException("gpx list needs at least 2 points!");
         }
 
@@ -159,12 +163,15 @@ public class MapMatching {
             List<GPXEntry> gpxSublist = gpxList.subList(separatedListStartIndex, separatedListEndIndex);
 
             if (gpxSublist.size() < 2) {
+                html.add("<span style=\"color:red;\">");
+                html.add("GPX sublist is too short:" + gpxSublist + " taken from" + separatedListStartIndex + "," + separatedListEndIndex + gpxList.size() + "<br>");
+                html.add("</span>");
                 throw new IllegalStateException("GPX sublist is too short: "
                         + gpxSublist + " taken from [" + separatedListStartIndex + "," + separatedListEndIndex + ") " + gpxList.size());
             }
 
             boolean doEnd = currentIndex >= gpxList.size();
-            MatchResult subMatch = doWork(firstQueryResults, gpxSublist, gpxLength, doEnd);
+            MatchResult subMatch = doWork(firstQueryResults, gpxSublist, gpxLength, doEnd, html);
             List<EdgeMatch> result = subMatch.getEdgeMatches();
             matchResult.setMatchLength(matchResult.getMatchLength() + subMatch.getMatchLength());
             matchResult.setMatchMillis(matchResult.getMatchMillis() + subMatch.getMatchMillis());
@@ -220,7 +227,7 @@ public class MapMatching {
      * doEnd is true, then the original edge is added
      */
     MatchResult doWork(List<QueryResult> firstQueryResults,
-            List<GPXEntry> gpxList, double gpxLength, boolean doEnd) {
+            List<GPXEntry> gpxList, double gpxLength, boolean doEnd, List <String> htmlresult) {
         int guessedEdgesPerPoint = 4;
         List<EdgeMatch> edgeMatches = new ArrayList<EdgeMatch>();
         final TIntObjectHashMap<List<GPXExtension>> extensionMap
@@ -265,6 +272,13 @@ public class MapMatching {
         }
 
         if (startQRList == null || endQRList == null) {
+            htmlresult.add("<span style=\"color:red;\">");
+            htmlresult.add("Input GPX list does not contain valid points or outside of imported area!? " + gpxList.size() + " points, " + gpxList.get(0) + "," + gpxList.get(1) + "<br>");
+            String start=gpxList.get(0).getLat() + "%2C" + gpxList.get(0).getLon();
+            String end=gpxList.get(1).getLat() + "%2C" + gpxList.get(1).getLon();
+            String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
+            htmlresult.add("Check: <a href=" + Link +"</a>" + Link);
+            htmlresult.add("</span>");
             throw new IllegalArgumentException("Input GPX list does not contain valid points "
                     + "or outside of imported area!? " + gpxList.size() + ", " + gpxList);
         }
@@ -349,11 +363,18 @@ public class MapMatching {
 
         algo.runAlgo();
         if (!algo.oneNodeWasReached()) {
-            throw new RuntimeException("Cannot find matching path! Wrong vehicle " + encoder
-                    + " or missing OpenStreetMap data? Try to increase maxSearchMultiplier ("
-                    + maxSearchMultiplier + "). Current gpx sublist:"
-                    + gpxList.size() + ", start list:" + startQRList + ", end list:" + endQRList
-                    + ", bounds: " + graph.getBounds());
+            for(int i=0;i<gpxList.size();i++) {
+                QueryResult resStart=startQRList.get(i);
+                QueryResult resEnd=endQRList.get(i);
+                String start=resStart.getQueryPoint().toString().replace(",", "%2C");
+                String end=resEnd.getQueryPoint().toString().replace(",", "%2C");
+                String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
+                htmlresult.add("<span style=\"color:red;\">");
+                htmlresult.add("Cannot find matching path. Please check for OSM data problems <a href=" + Link +"</a>" + Link);
+                htmlresult.add("</span");
+            }
+            throw new RuntimeException("Cannot find matching path! Missing or old OpenStreetMap data? "
+                    + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }
 
         // choose a good end point i.e. close to query point but also close to the start points
