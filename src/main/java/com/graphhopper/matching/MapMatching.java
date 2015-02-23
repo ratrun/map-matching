@@ -79,6 +79,21 @@ public class MapMatching {
     private final int nodeCount;
     private DistanceCalc distanceCalc = new DistancePlaneProjection();
     private boolean forceRepair;
+
+    private void AddQRToHtml(List <String> htmlresult, String errortext, int size, List<QueryResult> startQRList, List<QueryResult> endQRList)
+    {
+            for(int i=0;i<size;i++) {
+                QueryResult resStart=startQRList.get(i);
+                QueryResult resEnd=endQRList.get(i);
+                String start=resStart.getQueryPoint().toString().replace(",", "%2C");
+                String end=resEnd.getQueryPoint().toString().replace(",", "%2C");
+                String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
+                htmlresult.add("<span style=\"color:red;\">");
+                htmlresult.add(errortext + " <a href=" + Link +"</a>" + Link);
+                htmlresult.add("</span");    
+            }
+    }
+    
     private static final Comparator<QueryResult> CLOSEST_MATCH = new Comparator<QueryResult>() {
         @Override
         public int compare(QueryResult o1, QueryResult o2) {
@@ -363,16 +378,7 @@ public class MapMatching {
 
         algo.runAlgo();
         if (!algo.oneNodeWasReached()) {
-            for(int i=0;i<gpxList.size();i++) {
-                QueryResult resStart=startQRList.get(i);
-                QueryResult resEnd=endQRList.get(i);
-                String start=resStart.getQueryPoint().toString().replace(",", "%2C");
-                String end=resEnd.getQueryPoint().toString().replace(",", "%2C");
-                String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
-                htmlresult.add("<span style=\"color:red;\">");
-                htmlresult.add("Cannot find matching path. Please check for OSM data problems <a href=" + Link +"</a>" + Link);
-                htmlresult.add("</span");
-            }
+            AddQRToHtml(htmlresult, "Cannot find matching path! Missing or old OpenStreetMap data?", gpxList.size(), startQRList, endQRList);
             throw new RuntimeException("Cannot find matching path! Missing or old OpenStreetMap data? "
                     + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }
@@ -382,6 +388,7 @@ public class MapMatching {
         List<EdgeIteratorState> pathEdgeList = path.calcEdges();
 
         if (pathEdgeList.isEmpty()) {
+            AddQRToHtml(htmlresult, "Cannot extract path - no edges returned? ", gpxList.size(), startQRList, endQRList);
             throw new RuntimeException("Cannot extract path - no edges returned? "
                     + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }
