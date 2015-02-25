@@ -90,7 +90,32 @@ public class MapMatching {
                 String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
                 htmlresult.add("<span style=\"color:red;\">");
                 htmlresult.add(errortext + " <a href=" + Link +"</a>" + Link);
-                htmlresult.add("</span");    
+                String left;
+                String right;
+                String top;
+                String bottom;
+                if ((resStart.getQueryPoint().getLat()) < (resEnd.getQueryPoint().getLat())) {
+                    bottom=Double.toString(resStart.getQueryPoint().getLat());
+                    top=Double.toString(resEnd.getQueryPoint().getLat());
+                }
+                else
+                {
+                    top=Double.toString(resStart.getQueryPoint().getLat());
+                    bottom=Double.toString(resEnd.getQueryPoint().getLat());
+                }
+                
+                if ((resStart.getQueryPoint().getLon()) < (resEnd.getQueryPoint().getLon())) {
+                    left=Double.toString(resStart.getQueryPoint().getLon());
+                    right=Double.toString(resEnd.getQueryPoint().getLon());
+                }
+                else
+                {
+                    right=Double.toString(resStart.getQueryPoint().getLon());
+                    left=Double.toString(resEnd.getQueryPoint().getLon());
+                }
+                
+                htmlresult.add("<td> <a href=" + "http://127.0.0.1:8111/load_and_zoom?left=" + left + "&right=" + right + "&top=" + top +"&bottom=" + bottom + " target=\"hiddenIframe\" >" + "  JOSM" + "</a> </td>");
+                htmlresult.add("</span");
             }
     }
     
