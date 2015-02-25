@@ -211,6 +211,13 @@ public class MapMatching {
             }
 
             boolean doEnd = currentIndex >= gpxList.size();
+            // Skip search if start and end point are the same
+            if ( (gpxSublist.size() == 2 ) &&
+                 (gpxSublist.get(1).getLat()==gpxSublist.get(0).getLat()) &&
+                 (gpxSublist.get(1).getLon()==gpxSublist.get(0).getLon()) )   {
+                  break;
+            }
+
             MatchResult subMatch = doWork(firstQueryResults, gpxSublist, gpxLength, doEnd, html);
             List<EdgeMatch> result = subMatch.getEdgeMatches();
             matchResult.setMatchLength(matchResult.getMatchLength() + subMatch.getMatchLength());
