@@ -114,6 +114,8 @@ public class MapMatchingMain {
             logger.info("Now processing " + files.length + " files");
             StopWatch importSW = new StopWatch();
             StopWatch matchSW = new StopWatch();
+            int successcounter = 0;
+            int failcounter = 0;
             for (File gpxFile : files) {
                 ArrayList <String>  htmlresult= new ArrayList <String> ();
                 try {
@@ -135,6 +137,7 @@ public class MapMatchingMain {
                     htmlresult.add("gpx length: &ensp; " + (float) mr.getGpxEntriesLength() + " vs " + (float) mr.getMatchLength() + "<br>");
                     htmlresult.add("gpx time: &ensp; " + mr.getGpxEntriesMillis() / 1000f + " vs " + mr.getMatchMillis() / 1000f  + "<br>");
                     htmlresult.add("</small>");
+                    successcounter++;
                     
                     String outFile = gpxFile.getAbsolutePath() + ".res.gpx";
                     new GPXFile(mr).doExport(outFile);
@@ -144,6 +147,7 @@ public class MapMatchingMain {
                 } catch (Exception ex) {
                     importSW.stop();
                     matchSW.stop();
+                    failcounter++;
                     //htmlresult.add("Problem with file " + gpxFile + " Error: " + ex.getMessage() + "<br>");
                     logger.error("Problem with file " + gpxFile + " Error: " + ex.getMessage());
                 }
@@ -151,7 +155,10 @@ public class MapMatchingMain {
             }
             System.out.println("gps import took:" + importSW.getSeconds() + "s, match took: " + matchSW.getSeconds());
 
-            generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), hopper.getEncodingManager().getSingle().toString());
+            if (args.get("report", "") != "")
+            {
+                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), hopper.getEncodingManager().getSingle().toString(), successcounter, failcounter);
+            }
 
         } else {
             System.out.println("Usage: Do an import once, then do the matching\n"
@@ -161,7 +168,7 @@ public class MapMatchingMain {
         }
     }
     
-    private void generateHtmlReport (List <String> gpxfiles, ArrayList <ArrayList<String>> findinglistoflists, String reportFileName, String vehicle)
+    private void generateHtmlReport (List <String> gpxfiles, ArrayList <ArrayList<String>> findinglistoflists, String reportFileName, String vehicle, int successcounter, int failcounter)
     {
         StringBuilder html = new StringBuilder();
         html.append( "<!doctype html>\n" );
@@ -194,7 +201,7 @@ public class MapMatchingMain {
 
         html.append( "<body>\n" );
         
-        html.append("<h1>Result of map-match for vehicle " + vehicle + " </h1>");
+        html.append("<h1>Result of map-match for vehicle " + vehicle + " "+ successcounter + " OK, " + failcounter + " failed.</h1>");
         html.append("<table border=\"1\" cellpadding=\"2\" frame=\"box\">");
         html.append("<colgroup width=\"200\" span=\"3\"> <col width=\"70\"><col width=\"150\"><col width=\"700\"></colgroup>");
         int i = 0;
