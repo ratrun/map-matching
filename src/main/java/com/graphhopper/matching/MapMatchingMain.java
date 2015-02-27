@@ -18,6 +18,8 @@
 package com.graphhopper.matching;
 
 import com.graphhopper.GraphHopper;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.GraphStorage;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.*;
@@ -48,6 +50,8 @@ public class MapMatchingMain {
         String action = args.get("action", "").toLowerCase();
         args.put("graph.location", "./graph-cache");
         if (action.equals("import")) {
+            String vehicle = args.get("vehicle", "car").toLowerCase();
+            args.put("graph.flagEncoders", vehicle);
             args.put("osmreader.osm", args.get("datasource", ""));
             GraphHopper hopper = new GraphHopper().init(args);
             hopper.setCHEnable(false);
@@ -58,15 +62,16 @@ public class MapMatchingMain {
             hopper.setCHEnable(false);
             logger.info("loading graph from cache");
             hopper.load("./graph-cache");
+            FlagEncoder firstEncoder = hopper.getEncodingManager().fetchEdgeEncoders().get(0);
             GraphStorage graph = hopper.getGraph();
 
             int gpxAccuracy = args.getInt("gpxAccuracy", 15);
             logger.info("Setup lookup index. Accuracy filter is at " + gpxAccuracy + "m");
             LocationIndexMatch locationIndex = new LocationIndexMatch(graph,
                     (LocationIndexTree) hopper.getLocationIndex(), gpxAccuracy);
-            MapMatching mapMatching = new MapMatching(graph, locationIndex, hopper.getEncodingManager().getSingle());
+            MapMatching mapMatching = new MapMatching(graph, locationIndex, firstEncoder);
             mapMatching.setSeparatedSearchDistance(args.getInt("separatedSearchDistance", 500));
-            mapMatching.setMaxSearchMultiplier(args.getInt("maxSearchMultiplier", 50));
+            mapMatching.setMaxSearchMultiplier(args.getInt("maxSearchMultiplier", 100));
             mapMatching.setForceRepair(args.getBool("forceRepair", false));
 
             // do the actual matching, get the GPX entries from a file or via stream
@@ -152,7 +157,7 @@ public class MapMatchingMain {
 
             if (args.get("report", "") != "")
             {
-                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), hopper.getEncodingManager().getSingle().toString(), successcounter, failcounter);
+                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), firstEncoder.toString(), successcounter, failcounter);
             }
 
         } else {

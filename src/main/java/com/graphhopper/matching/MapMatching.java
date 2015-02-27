@@ -410,9 +410,13 @@ public class MapMatching {
 
         algo.runAlgo();
         if (!algo.oneNodeWasReached()) {
-            AddQRToHtml(htmlresult, "Cannot find matching path! Missing or old OpenStreetMap data?", gpxList.size(), startQRList, endQRList);
-            throw new RuntimeException("Cannot find matching path! Missing or old OpenStreetMap data? "
-                    + gpxList.size() + ", " + startQRList + ", " + endQRList);
+            AddQRToHtml(htmlresult, "Cannot find matching path! Wrong vehicle " + encoder + " or missing OpenStreetMap data? Try to increase maxSearchMultiplier (" 
+                    + maxSearchMultiplier + ") Current gxg sublist"  + ", bounds: " + graph.getBounds(), gpxList.size(), startQRList, endQRList);
+            throw new RuntimeException("Cannot find matching path! Wrong vehicle " + encoder
+                    + " or missing OpenStreetMap data? Try to increase maxSearchMultiplier ("
+                    + maxSearchMultiplier + "). Current gpx sublist:"
+                    + gpxList.size() + ", start list:" + startQRList + ", end list:" + endQRList
+                    + ", bounds: " + graph.getBounds());
         }
 
         // choose a good end point i.e. close to query point but also close to the start points
