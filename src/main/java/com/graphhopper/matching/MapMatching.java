@@ -89,7 +89,7 @@ public class MapMatching {
                 String end=resEnd.getQueryPoint().toString().replace(",", "%2C");
                 String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
                 htmlresult.add("<span style=\"color:red;\">");
-                htmlresult.add(errortext + " <a href=" + Link +"</a>" + Link);
+                htmlresult.add(errortext + " <a href=" + Link +">" + Link + "</a>");
                 String left;
                 String right;
                 String top;
@@ -324,7 +324,7 @@ public class MapMatching {
             String start=gpxList.get(0).getLat() + "%2C" + gpxList.get(0).getLon();
             String end=gpxList.get(1).getLat() + "%2C" + gpxList.get(1).getLon();
             String Link="http://127.0.0.1:8989/?point=" + start + "&point=" + end + "&" + encoder.toString();
-            htmlresult.add("Check: <a href=" + Link +"</a>" + Link);
+            htmlresult.add("Check: <a href=" + Link +">" + Link + "</a>");
             htmlresult.add("</span>");
             throw new IllegalArgumentException("Input GPX list does not contain valid points "
                     + "or outside of imported area!? " + gpxList.size() + ", " + gpxList);
