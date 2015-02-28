@@ -127,12 +127,11 @@ public class MapMatchingTest {
 
         inputGPXEntries = createRandomGPXEntries(
                 new GHPoint(51.377781, 12.338333),
-                new GHPoint(51.377781, 12.338333));
+                new GHPoint(51.323317, 12.387085));
+        //Simulate two duplicate indentical entries at the end
         inputGPXEntries.add(inputGPXEntries.get(inputGPXEntries.size()-1));
         mr = mapMatching.doWork(inputGPXEntries, html);
-        assertEquals(mr.getGpxEntriesLength(), mr.getMatchLength(), 0.5);
-        assertEquals(mr.getGpxEntriesMillis(), mr.getMatchMillis(), 20);
-        assertEquals(0, mr.getEdgeMatches().size());
+        assertEquals(138, mr.getEdgeMatches().size());
         
         // TODO full path with 20m distortion
         // TODO full path with 40m distortion
