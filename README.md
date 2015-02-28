@@ -21,9 +21,13 @@ Install Java and Maven. Then import the area you want to do map-matching on:
 ./map-matching.sh action=import datasource=./some-dir/osm-file.pbf [vehicle=car]
 ```
 
-and then do these matches:
+and then do one of these matches:
 ```bash
+./map-matching.sh action=match gpx={[\w-_]*\.gpx}
+
+You can also use
 ./map-matching.sh action=match gpx=./track-data/.*gpx
+but this takes previous output files as input for a new run, which is probably not what you intend.
 ```
 
 Possible arguments are:
