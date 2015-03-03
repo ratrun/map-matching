@@ -410,9 +410,6 @@ public class MapMatching {
 
         algo.runAlgo();
         if (!algo.oneNodeWasReached()) {
-            AddQRToHtml(htmlresult, "Cannot find matching path! Missing or old OpenStreetMap data?", gpxList.size(), startQRList, endQRList);
-            throw new RuntimeException("Cannot find matching path! Missing or old OpenStreetMap data? "
-                    + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }
 
         // choose a good end point i.e. close to query point but also close to the start points
