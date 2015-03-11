@@ -160,7 +160,7 @@ public class MapMatchingMain {
 
             if (args.get("report", "") != "")
             {
-                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), hopper.getEncodingManager().getSingle().toString(), successcounter, failcounter);
+                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), firstEncoder.toString(), successcounter, failcounter);
             }
 
         } else {
