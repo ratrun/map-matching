@@ -79,9 +79,12 @@ public class MapMatching {
     private final int nodeCount;
     private DistanceCalc distanceCalc = new DistancePlaneProjection();
     private boolean forceRepair;
+    
+    private boolean josmFixLinkAdded;
 
-    private void AddQRToHtml(List <String> htmlresult, String errortext, int size, List<QueryResult> startQRList, List<QueryResult> endQRList)
+    private void AddJOSMRemoteControlLinkToHtml(List <String> htmlresult, String errortext, int size, List<QueryResult> startQRList, List<QueryResult> endQRList)
     {
+            josmFixLinkAdded = true;
             for(int i=0;i<size;i++) {
                 QueryResult resStart=startQRList.get(i);
                 QueryResult resEnd=endQRList.get(i);
@@ -117,6 +120,11 @@ public class MapMatching {
                 htmlresult.add("<td> <a href=" + "http://127.0.0.1:8111/load_and_zoom?left=" + left + "&right=" + right + "&top=" + top +"&bottom=" + bottom + " target=\"hiddenIframe\" >" + "  JOSM" + "</a> </td>");
                 htmlresult.add("</span");
             }
+    }
+    
+    public boolean getFixLinkAdded()
+    {
+        return josmFixLinkAdded;
     }
     
     private static final Comparator<QueryResult> CLOSEST_MATCH = new Comparator<QueryResult>() {
@@ -169,6 +177,7 @@ public class MapMatching {
      */
     public MatchResult doWork(List<GPXEntry> gpxList, List <String> html) {
         int currentIndex = 0;
+        this.josmFixLinkAdded = false;
         if (gpxList.size() < 2) {
             html.add("<span style=\"color:red;\">");
             html.add("gpx list needs at least 2 points!<br>");
@@ -410,6 +419,13 @@ public class MapMatching {
 
         algo.runAlgo();
         if (!algo.oneNodeWasReached()) {
+            AddJOSMRemoteControlLinkToHtml(htmlresult, "Cannot find matching path for vehicle " + encoder + 
+                        ". Check missing OpenStreetMap data at: ", gpxList.size(), startQRList, endQRList);
+            throw new RuntimeException("Cannot find matching path! Wrong vehicle " + encoder
+                    + " or missing OpenStreetMap data? Try to increase maxSearchMultiplier ("
+                    + maxSearchMultiplier + "). Current gpx sublist:"
+                    + gpxList.size() + ", start list:" + startQRList + ", end list:" + endQRList
+                    + ", bounds: " + graph.getBounds());
         }
 
         // choose a good end point i.e. close to query point but also close to the start points
@@ -417,7 +433,7 @@ public class MapMatching {
         List<EdgeIteratorState> pathEdgeList = path.calcEdges();
 
         if (pathEdgeList.isEmpty()) {
-            AddQRToHtml(htmlresult, "Cannot extract path - no edges returned? ", gpxList.size(), startQRList, endQRList);
+            AddJOSMRemoteControlLinkToHtml(htmlresult, "Cannot extract path - no edges returned? ", gpxList.size(), startQRList, endQRList);
             throw new RuntimeException("Cannot extract path - no edges returned? "
                     + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }

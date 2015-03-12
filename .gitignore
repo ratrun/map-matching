@@ -5,4 +5,5 @@ test-input.gpx
 test.gpx
 graph-cache/
 nbactions.xml
+*testfiles*
 *pbf

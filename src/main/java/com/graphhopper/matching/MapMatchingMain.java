@@ -47,6 +47,9 @@ public class MapMatchingMain {
 
     private void start(CmdArgs args) {
         String action = args.get("action", "").toLowerCase();
+        int separatedSearchDistance = args.getInt("separatedSearchDistance", 500);
+        int maxSearchMultiplier = args.getInt("maxSearchMultiplier", 100);
+        boolean forceRepair = args.getBool("forceRepair", false);
         args.put("graph.location", "./graph-cache");
         if (action.equals("import")) {
             String vehicle = args.get("vehicle", "car").toLowerCase();
@@ -73,9 +76,9 @@ public class MapMatchingMain {
             LocationIndexMatch locationIndex = new LocationIndexMatch(graph,
                     (LocationIndexTree) hopper.getLocationIndex(), gpxAccuracy);
             MapMatching mapMatching = new MapMatching(graph, locationIndex, firstEncoder);
-            mapMatching.setSeparatedSearchDistance(args.getInt("separatedSearchDistance", 500));
-            mapMatching.setMaxSearchMultiplier(args.getInt("maxSearchMultiplier", 100));
-            mapMatching.setForceRepair(args.getBool("forceRepair", false));
+            mapMatching.setSeparatedSearchDistance(separatedSearchDistance);
+            mapMatching.setMaxSearchMultiplier(maxSearchMultiplier);
+            mapMatching.setForceRepair(forceRepair);
 
             // do the actual matching, get the GPX entries from a file or via stream
             String gpxLocation = args.get("gpx", "");
@@ -137,8 +140,8 @@ public class MapMatchingMain {
                     
                     htmlresult.add("<small>");
                     htmlresult.add("matches: &ensp; " + mr.getEdgeMatches().size() + ", gps entries:" + inputGPXEntries.size() + "<br>");
-                    htmlresult.add("gpx length: &ensp; " + (float) mr.getGpxEntriesLength() + " vs " + (float) mr.getMatchLength() + "<br>");
-                    htmlresult.add("gpx time: &ensp; " + mr.getGpxEntriesMillis() / 1000f + " vs " + mr.getMatchMillis() / 1000f  + "<br>");
+                    htmlresult.add("gpx length: &ensp; " + (float) mr.getGpxEntriesLength() + " vs " + (float) mr.getMatchLength() + " meters <br>");
+                    htmlresult.add("gpx time: &ensp; " + mr.getGpxEntriesMillis() / 1000f + " vs " + mr.getMatchMillis() / 1000f  + " seconds <br>");
                     htmlresult.add("</small>");
                     successcounter++;
                     
@@ -154,13 +157,19 @@ public class MapMatchingMain {
                     //htmlresult.add("Problem with file " + gpxFile + " Error: " + ex.getMessage() + "<br>");
                     logger.error("Problem with file " + gpxFile + " Error: " + ex.getMessage());
                 }
+                
+                if (!mapMatching.getFixLinkAdded() ) {
+                     htmlresult.add("<td></td>");
+                }
+
                 htmlresultlist.add(htmlresult);
             }
             System.out.println("gps import took:" + importSW.getSeconds() + "s, match took: " + matchSW.getSeconds());
 
             if (args.get("report", "") != "")
             {
-                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), firstEncoder.toString(), successcounter, failcounter);
+                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), firstEncoder.toString(), 
+                                     successcounter, failcounter, gpxAccuracy, separatedSearchDistance, maxSearchMultiplier, forceRepair );
             }
 
         } else {
@@ -171,7 +180,14 @@ public class MapMatchingMain {
         }
     }
     
-    private void generateHtmlReport (List <String> gpxfiles, ArrayList <ArrayList<String>> findinglistoflists, String reportFileName, String vehicle, int successcounter, int failcounter)
+    private void generateHtmlReport (List <String> gpxfiles, ArrayList <ArrayList<String>> findinglistoflists, String reportFileName, String vehicle, 
+                                     int successcounter, 
+                                     int failcounter,
+                                     int gpxAccuracy,
+                                     int separatedSearchDistance,
+                                     int maxSearchMultiplier,
+                                     boolean forceRepair
+                                     )
     {
         StringBuilder html = new StringBuilder();
         html.append( "<!doctype html>\n" );
@@ -204,17 +220,27 @@ public class MapMatchingMain {
 
         html.append( "<body>\n" );
         
-        html.append("<h1>Result of map-match for vehicle " + vehicle + " "+ successcounter + " OK, " + failcounter + " failed.</h1>");
+        html.append("<h2>Result of GraphHopper map matching for vehicle " + vehicle + " " + successcounter + " OK, " + failcounter + " failed.</h2>");
+        html.append("Algorithm parameters: gpxAccuracy= " + gpxAccuracy + ", separatedSearchDistance=" + separatedSearchDistance + ", maxSearchMultiplier=" + maxSearchMultiplier + ", forceRepair=" + forceRepair + "<br><br>");
+        
         html.append("<table border=\"1\" cellpadding=\"2\" frame=\"box\">");
-        html.append("<colgroup width=\"200\" span=\"3\"> <col width=\"70\"><col width=\"150\"><col width=\"700\"></colgroup>");
+        html.append("<colgroup width=\"200\" span=\"3\"> <col width=\"70\"><col width=\"250\"><col width=\"750\"></colgroup>");
+        
+        html.append("<tr>");
+        html.append("<td>" + "File #" +"</td>");
+        html.append("<td>" + "GPX input" +"</td>");
+        html.append("<td>" + "Result links" + "</td>");
+        html.append("<td>" + "Fix links" + "</td>");
+        html.append("</tr>");
+        
         int i = 0;
         for ( String josmlink : gpxfiles ) {
               html.append("<tr>");
-              html.append("<td>" + "File " + i  +"</td>");
+              html.append("<td>" + "File " + (i+1)  +"</td>");
               html.append("<td>" + josmlink +"</td>");
               
               html.append("<td>");
-              List <String> findings=findinglistoflists.get(i);
+              List <String> findings = findinglistoflists.get(i);
               for ( String reportline : findings ) {
                   html.append(reportline);
               }
