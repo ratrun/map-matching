@@ -24,6 +24,7 @@ Install Java and Maven. Then import the area you want to do map-matching on:
 and then do one of these matches:
 ```bash
 ./map-matching.sh action=match gpx={[\w-_]*\.gpx}
+The string within the braces "{" and "}" is interpreted as a java regular expression.
 
 You can also use
 ./map-matching.sh action=match gpx=./track-data/.*gpx
@@ -36,7 +37,11 @@ gpxAccuracy=15              # default=15, type=integer, unit=meter
 separatedSearchDistance=500 # default=500, type=integer, unit=meter
 maxSearchMultiplier=50      # default=50, type=integer
 forceRepair=false           # default=false, type=boolean
+htmlReport=false            # default=false, type=boolean
+                            # If the htmlReport argument is set and multiple gpx files are used, a single html report named "mapmatchresult.html" gets generated.
+                            # If just a single gpx file is used as input, the resulting file name starts with "mapmatchresult" and also includes the file name of the input gpx file.
 ```
+
 
 This will produce gpx results similar named as the input files.
 

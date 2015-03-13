@@ -46,6 +46,7 @@ public class MapMatchingMain {
     private final List <String> gpxfiles = new ArrayList <String> ();
 
     private void start(CmdArgs args) {
+        String htmlReportFileName;
         String action = args.get("action", "").toLowerCase();
         int separatedSearchDistance = args.getInt("separatedSearchDistance", 500);
         int maxSearchMultiplier = args.getInt("maxSearchMultiplier", 100);
@@ -83,9 +84,9 @@ public class MapMatchingMain {
             // do the actual matching, get the GPX entries from a file or via stream
             String gpxLocation = args.get("gpx", "");
             File[] files;
+            File dir = new File(".");
+            int lastIndex;
             if (gpxLocation.contains("*")) {
-                int lastIndex;
-                File dir = new File(".");
                 final String pattern;
                 if ( (gpxLocation.contains("{")) && (gpxLocation.contains("}")) ) {
                    // Treat everything within {} as regular expression for the filename. E.g. {[\w-_]*\.gpx} can be used to exclude prior generated "res" files
@@ -111,10 +112,15 @@ public class MapMatchingMain {
                         return name.matches(pattern);
                     }
                 });
+                htmlReportFileName = dir.toString() + File.separator + "mapmatchresult.html";
             } else {
+                lastIndex = gpxLocation.lastIndexOf(File.separator);
+                dir = new File(gpxLocation.substring(0, lastIndex));
                 files = new File[]{
                     new File(gpxLocation)
                 };
+                String filename = gpxLocation.substring(lastIndex + 1);
+                htmlReportFileName = dir.toString() + File.separator + "mapmatchresult" + filename + ".html";
             }
 
             logger.info("Now processing " + files.length + " files");
@@ -166,9 +172,9 @@ public class MapMatchingMain {
             }
             System.out.println("gps import took:" + importSW.getSeconds() + "s, match took: " + matchSW.getSeconds());
 
-            if (args.get("report", "") != "")
+            if ("true".equals(args.get("htmlReport", "false")))
             {
-                generateHtmlReport(gpxfiles,htmlresultlist,args.get("report", ""), firstEncoder.toString(), 
+                generateHtmlReport(gpxfiles,htmlresultlist, htmlReportFileName , firstEncoder.toString(), 
                                      successcounter, failcounter, gpxAccuracy, separatedSearchDistance, maxSearchMultiplier, forceRepair );
             }
 
