@@ -28,7 +28,8 @@ The string within the braces "{" and "}" is interpreted as a java regular expres
 
 You can also use
 ./map-matching.sh action=match gpx=./track-data/.*gpx
-but this takes previous output files as input for a new run, which is probably not what you intend.
+but this takes previous output files as input for a new run, which is probably not 
+intended.
 ```
 
 Possible arguments are:
@@ -38,8 +39,12 @@ separatedSearchDistance=500 # default=500, type=integer, unit=meter
 maxSearchMultiplier=50      # default=50, type=integer
 forceRepair=false           # default=false, type=boolean
 htmlReport=false            # default=false, type=boolean
-                            # If the htmlReport argument is set and multiple gpx files are used, a single html report named "mapmatchresult.html" gets generated.
-                            # If just a single gpx file is used as input, the resulting file name starts with "mapmatchresult" and also includes the file name of the input gpx file.
+                            # If the htmlReport argument is set and multiple gpx files are
+                            # used, a single html report named "mapmatchresult.html" gets
+                            # generated.
+                            # If just a single gpx file is used as input, the resulting
+                            # file name starts with "mapmatchresult" and also includes
+                            # the file name of the input gpx file.
 ```
 
 
