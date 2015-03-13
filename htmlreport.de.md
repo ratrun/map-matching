@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html>
-<title>OSM Daten Qualitätsverbesserung durch Analyse von GraphHopper "Map Matching" Ergebnissen</title>
-
-<xmp theme="united" style="display:none;">
-
 #OSM Daten Qualitätsverbesserung durch Analyse von GraphHopper "Map Matching" Ergebnissen
 
 Bei der Evaluierung der GraphHopper "Map Matching" Implementierung mit 
@@ -112,9 +106,3 @@ auf relativ simple, gründliche, schnelle und auch automatisierbare Weise, sodass
 das Verbessern der OSM Daten damit recht flott erfolgen kann.
 
 __Viel Spass beim Analysieren und Verbessern der OSM Daten anhand von GPX Dateien!__
-
-
-</xmp>
-
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
-</html>
