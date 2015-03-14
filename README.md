@@ -23,7 +23,7 @@ Install Java and Maven. Then import the area you want to do map-matching on:
 
 and then do one of these matches:
 ```bash
-./map-matching.sh action=match gpx={[\w-_]*\.gpx}
+./map-matching.sh action=match gpx={[\w\u00C0-\u00ff-_\(\)]*\.gpx}
 The string within the braces "{" and "}" is interpreted as a java regular expression.
 
 You can also use

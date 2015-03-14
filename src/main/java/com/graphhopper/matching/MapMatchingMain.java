@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -40,6 +43,17 @@ public class MapMatchingMain {
     public static void main(String[] args) {
         new MapMatchingMain().start(CmdArgs.read(args));
     }
+    
+    private String formatTextUml (String text)
+    {
+        text = text.replaceAll("ä", "&auml;");
+        text = text.replaceAll("Ä", "&Auml;");
+        text = text.replaceAll("ö", "&ouml;");
+        text = text.replaceAll("Ö", "&Ouml;");
+        text = text.replaceAll("ü", "&uuml;");
+        text = text.replaceAll("Ü", "&Uuml;");
+        return text;
+    }    
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ArrayList <ArrayList<String>> htmlresultlist = new ArrayList<ArrayList<String>>();
@@ -136,7 +150,7 @@ public class MapMatchingMain {
                     importSW.stop();
                     matchSW.start();
                     String fileName = gpxFile.getAbsolutePath().substring(gpxFile.getAbsolutePath().lastIndexOf("\\")+1);
-                    gpxfiles.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + gpxFile.toString() + " target=\"hiddenIframe\" >" + fileName + "</a>");
+                    gpxfiles.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + gpxFile.toString() + " target=\"hiddenIframe\" >" + formatTextUml(fileName) + "</a>");
                     MatchResult mr = mapMatching.doWork(inputGPXEntries,htmlresult);
                     matchSW.stop();
                     System.out.println(gpxFile);
@@ -154,7 +168,7 @@ public class MapMatchingMain {
                     String outFile = gpxFile.getAbsolutePath() + ".res.gpx";
                     new GPXFile(mr).doExport(outFile);
                     fileName = fileName + ".res.gpx";
-                    htmlresult.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + outFile + " target=\"hiddenIframe\" >" + fileName + "</a>");
+                    htmlresult.add("<a href=" + "http://127.0.0.1:8111/open_file?filename=" + outFile + " target=\"hiddenIframe\" >" + formatTextUml(fileName) + "</a>");
 
                 } catch (Exception ex) {
                     importSW.stop();
@@ -264,7 +278,10 @@ public class MapMatchingMain {
         html.append( "</html>" );
         try {
             File reportFile = new File (reportFileName);
-            PrintWriter out = new PrintWriter( reportFile );
+            
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(reportFile),
+                StandardCharsets.UTF_8), true);
+            
             out.println(html);
             out.close();
          } catch (FileNotFoundException e) {
