@@ -11,8 +11,9 @@ und passierbare Verbindungen steckt, das bisher nicht in den OSM Daten
 abgebildet worden ist. Für die Analyse wird dabei ein HTML Report erzeugt,
 über den die OSM Daten mit Hilfe von JOSM angesehen und bearbeitet werden können.
 
-Im folgenden werden die dabei gemachten Erfahrungen beschrieben, die es 
-leichter machen sollen eine Analyse mit eignen GPX Dateien auszuprobieren.
+Im folgenden werden die dabei gemachten Erfahrungen und beschrieben, die es 
+möglich machen ein Beispiel aus Leipzig nachzuvollziehen und es ermöglichen 
+die Methode anhand eigener GPX Dateien zu testen.
 
 Der Algorithmus versucht basierend auf der in GPX Daten enthaltenen Koordinaten 
 anhand der OSM Daten einen der Aktivität angepassten möglichst deckungsgleichen 
@@ -26,25 +27,23 @@ Momentan muss man für einen Test GraphHopper "Map Matching" leider noch lokal
 installieren. Vielleicht findet sich in Zukunft jemand, der diese 
 Analysemöglichkeit als Web-Service anbietet, bei dem die Analyse optional 
 durchgeführt wird, wenn man GPX Daten auf eines der GPX Sammelportale 
-oder noch besser auf OSM hochlädt. Bis sich wer findet, der soe etwas umsetzt, muss 
-man GraphHopper "Map Matching" durch Verwendung einer lokale Instanz aus einem OSM 
+oder noch besser auf OSM hochlädt. Bis sich wer findet, der so etwas umsetzt, muss 
+man GraphHopper "Map Matching" durch Verwendung einer lokalen Instanz aus einem OSM 
 Datenextrakt für einen entsprechenden Bereich (z.B. von der geofabrik) die 
 GraphHopper graph Daten für die gewünschte Aktivität erstellen, um danach das 
-GraphHopper "Map Matching" auf die vorhandenen GPX Dateien anzuwerfen. Siehe die 
-GraphHopper "Map Matching" 
-[Beschreibung](https://github.com/ratrun/map-matching/tree/htmlresultoutput "Beschreibung"). 
+GraphHopper "Map Matching" auf die vorhandenen GPX Dateien anzuwerfen. 
 Als Ergebnis erhält man eine 
 HTML Tabelle der erfolgreichen und der nicht erfolgreich zuordenbaren GPX 
 Dateien:
 
 ![Result](GraphHopperMapMatchingResultTable.PNG "Result")
 
-Bei Erfolg werden die originalen in der der zweiten Spaltre und die gefundenen GPX Daten in der Tabelle in 
+Bei Erfolg werden die originalen in der zweiten Spalte und die gefundenen GPX Datei in der Tabelle in 
 der dritten Spalte mit dem 
 [Remote Control Mechanismus von JOSM](http://josm.openstreetmap.de/wiki/Help/Preferences/RemoteControl "JOSM Remote Control") 
 verknüpft, damit man beide auf Knopfdruck in JOSM laden kann. 
 Bei gröberen Unterschieden in der Distanz der beiden GPS Dateien können die 
-beiden GPX Suren in JOSM graphisch übereinandergelegt werden, um die Abweichungen zu vergleichen. 
+beiden GPX Spuren in JOSM graphisch übereinandergelegt werden, um die Abweichungen zu vergleichen. 
 Bei den Stellen mit größeren Abweichungen im Verlauf kann man in JOSM die OSM Datenlage 
 überprüfen indem man den entsprechenden OSM Datenausschnitt nachlädt. Bei einem 
 Abbruch des Algorithmus durch einen Fehler wird in der "Result links" Spalte 
@@ -65,7 +64,7 @@ OSM Daten manuell genauer überprüfen kann. Für die Analyse ist es meist
 hilfreich zuerst die entsprechende Ursprungs GPX Datei über die Spalte ganz 
 links in JOSM zu laden.
  
-Um die Ergebnisse und erkannte Fehler zu Beurteilen ist das Wissen und 
+Um die Ergebnisse und erkannten Fehler zu beurteilen ist das Wissen und 
 die Erinnerung des GPX track Autors sehr wichtig. Mit fremden GPX Daten dürfte 
 es nur in seltenen Fällen möglich sein eine sinnvolle OSM Datenverbesserung 
 durchzuführen.
@@ -90,7 +89,7 @@ Hier ein paar Gründe für das Scheitern des "Map Matchings":
    auswählt, das in Wirklichkeit nicht verwendet worden ist. Solch einen Fehler kann jedoch vom Algorithmus nicht erkannt werden und führt deshalb auch 
    nicht dazu, dass überhaupt keine passende Verbindung gefunden werden kann.
 * Zu restriktive Parametrisierung, z.B. hilft oft momentan das Erhöhen des maxSearchMultiplier Wertes auf z.B. 500. In zukünftigen GraphHopper "Map Matching"
-  Versionen sollte so ein fein Tuning nicht mehr nötig sein.
+  Versionen sollte so ein Tuning nicht mehr nötig sein.
 * Temporäre Umleitungen über provisorische normalerweise nicht verwendbaren Wege bei Baustellen, Murenabgängen oder anderen Naturereignissen
 * Momentan gibt es auch noch Fehler im "Map Matching" Algorithmus. Es ist z.B. relativ unwahrscheinlich, dass die Benützung von Fähren korrekt erkannt wird.
   Es scheint z.B. noch ein Problem beim Abbiegen aus Einbahnen zu geben. Weiters hängt es beim allerletzten Wegsegment oft davon ab, zu welchem Zeitpunkt man 
@@ -104,7 +103,7 @@ bereit, die alle notwendigen Komponenten enthält um das oben gezeigte Beispiel a
 
 Nach dem Entpacken müssen die Pfade zur Java Runtime in den beiden "cmd" b.z.w. "sh" scripten händisch angepasst werden.
 
-Die HTML Datei mapmatchresult.html sollte nach dem Aufruf von 
+Die HTML Datei mit dem Namen "mapmatchresult.html" sollte nach dem Aufruf von 
 
 ```Windows cmd
 rungraphhopper.cmd
@@ -117,6 +116,7 @@ b.z.w.
 rungraphhopper.sh
 runmatch.sh
 ```
+
 im Verzeichnis track-data neu erstellt werden.
 
 Für das Ausprobieren mit eigenen Dateien in einer anderen Region sollte es 
@@ -125,6 +125,6 @@ reichen im Verzeichnis "map-data" das OSM Extrakt abzulegen, den Dateinamen im
 durch eigenen Dateien zu ersetzen.
 
 Es wäre schön, wenn die aufgezeigte Methode andere Benutzer anregen könnte mit 
-ihren GPX Dateien zu experimientieren um die OSM Daten damit zu verbessern. 
+ihren GPX Dateien zu experimentieren um OSM Daten zu verbessern. 
 
 __Viel Spass!__
