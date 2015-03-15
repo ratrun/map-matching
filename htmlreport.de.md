@@ -105,16 +105,16 @@ bereit, die alle notwendigen Komponenten enthält um das oben gezeigte Beispiel a
 
 Nach dem Entpacken müssen die Pfade zur Java Runtime in den beiden "cmd" b.z.w. "sh" scripten händisch angepasst werden.
 
-Die HTML Datei mit dem Namen "mapmatchresult.html" sollte nach dem Aufruf von 
+Die HTML Datei mit dem Namen "mapmatchresult.html" sollte nach dem Aufruf unter Windows von 
 
-```Windows cmd
+```
 rungraphhopper.cmd
 runmatch.cmd
 ```
 
-b.z.w.
+b.z.w. für Linux
 
-```bash (Linux)
+```bash
 rungraphhopper.sh
 runmatch.sh
 ```
