@@ -433,7 +433,7 @@ public class MapMatching {
         List<EdgeIteratorState> pathEdgeList = path.calcEdges();
 
         if (pathEdgeList.isEmpty()) {
-            AddJOSMRemoteControlLinkToHtml(htmlresult, "Cannot extract path - no edges returned? ", gpxList.size(), startQRList, endQRList);
+            AddJOSMRemoteControlLinkToHtml(htmlresult, "Probably leaving covered OSM data area?", gpxList.size(), startQRList, endQRList);
             throw new RuntimeException("Cannot extract path - no edges returned? "
                     + gpxList.size() + ", " + startQRList + ", " + endQRList);
         }
