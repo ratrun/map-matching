@@ -28,7 +28,9 @@ installieren. Vielleicht findet sich in Zukunft jemand, der diese
 Analysemöglichkeit als Web-Service anbietet, bei dem die Analyse optional 
 durchgeführt wird, wenn man GPX Daten auf eines der GPX Sammelportale 
 oder noch besser auf OSM hochlädt. Bis sich wer findet, der so etwas umsetzt, muss 
-man GraphHopper "Map Matching" durch Verwendung einer lokalen Instanz aus einem OSM 
+man GraphHopper 
+[Map Matching](https://github.com/graphhopper/map-matching "Map Matching") 
+ durch Verwendung einer lokalen Instanz aus einem OSM 
 Datenextrakt für einen entsprechenden Bereich (z.B. von der geofabrik) die 
 GraphHopper graph Daten für die gewünschte Aktivität erstellen, um danach das 
 GraphHopper "Map Matching" auf die vorhandenen GPX Dateien anzuwerfen. 
@@ -110,9 +112,9 @@ rungraphhopper.cmd
 runmatch.cmd
 ```
 
-b.z.w. 
+b.z.w.
 
-```Linux bash
+```bash (Linux)
 rungraphhopper.sh
 runmatch.sh
 ```
