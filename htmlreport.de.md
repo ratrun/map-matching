@@ -115,8 +115,8 @@ runmatch.cmd
 b.z.w. für Linux
 
 ```bash
-rungraphhopper.sh
-runmatch.sh
+./rungraphhopper.sh
+./runmatch.sh
 ```
 
 im Verzeichnis track-data neu erstellt werden.
