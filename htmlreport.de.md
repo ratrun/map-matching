@@ -105,26 +105,31 @@ bereit, die alle notwendigen Komponenten enthält um das oben gezeigte Beispiel 
 
 Nach dem Entpacken müssen die Pfade zur Java Runtime in den beiden "cmd" b.z.w. "sh" scripten händisch angepasst werden.
 
-Die HTML Datei mit dem Namen "mapmatchresult.html" sollte nach dem Aufruf unter Windows von 
+Der Aufruf folgenden Befehle erfolgt aus dem Pfad, wohin die zip Datei entpackt wurde. Die Befehle zum Erzeugen der  HTML Datei mit dem Namen "mapmatchresult.html" lauten unter Windows: 
 
 ```
 rungraphhopper.cmd
+REM Warten bis eine Zeile Started server at HTTP :8989 geschrieben wird.
+REM In einem zweiten Fenster:
 runmatch.cmd
 ```
 
-b.z.w. für Linux
+b.z.w. für Linux:
 
 ```bash
+cd /tmp/extractpath
 ./rungraphhopper.sh
+# Warten bis eine Zeile Started server at HTTP :8989 geschrieben wird.
+REM In einem zweiten Fenster:
+cd /tmp/extractpath
 ./runmatch.sh
 ```
 
-im Verzeichnis track-data neu erstellt werden.
+Die Date "mapmatchresult.html" sollte im Verzeichnis track-data neu erstellt worden sein. 
 
 Für das Ausprobieren mit eigenen Dateien in einer anderen Region sollte es 
-reichen im Verzeichnis "map-data" das OSM Extrakt abzulegen, den Dateinamen im 
-"rungraphhopper" script und die Aktivität in der Datei "config.properties" anzupassen und die GPX Dateien im Verzeichnis "track-data" 
-durch eigenen Dateien zu ersetzen.
+reichen im Verzeichnis "map-data" das OSM Extrakt abzulegen, den OSM Extrakt Dateinamen im 
+"rungraphhopper" script und unter testfiles einen absoluten Verzeichnispfad einzufügen. Nach Anpassung der Aktivität in der Datei "config.properties" und Ersetzen der  GPX Dateien im Verzeichnis "track-data" durch eigenen Dateien sollte bei Wiederholdung der beiden Aufrufe ein Report für die eigenen GPX Dateien erstellt werden.
 
 Es wäre schön, wenn die aufgezeigte Methode Benutzer anregen könnte mit 
 ihren GPX Dateien zu experimentieren um OSM Daten zu verbessern. 
